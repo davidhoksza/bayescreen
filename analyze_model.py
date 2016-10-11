@@ -73,7 +73,7 @@ def analyze(model):
     for rec in sorted(all_ratios, key=lambda x: x["value"], reverse=True):
         print("{}, {}, {}, {}".format(rec["value"], rec["feature"], rec["bin"], rec["range"]))
         cnt_printed += 1
-        if not args.full and cnt_printed > 20: break;
+        if not args.full and cnt_printed > 50: break;
 
 
 def main():
