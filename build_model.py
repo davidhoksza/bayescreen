@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Computes probabilities comprising the Bayes model of activity.
+
+The purpose of this script is to compute the probabilities comprising the Bayes model of activity.
+The steps carried out to build the model from known active and inactive molecules, passed on input, include:
+
+* Extract fragmetns from the input molecules (main function)
+* Generate descriptors for all the fragments (main function)
+* Preprocess the features (removal of correlated features, normalization, binning) (main adn build_model function)
+* Computation of the probabilities which comprise the model (build_model function)
+* Writing out the model in JSON format (main function)
 
 """
 
@@ -24,33 +32,22 @@ __license__ = 'X11'
 
 
 def build_model(fn_actives_json, fn_inactives_json, features, cnt_bins=100):
+    """
+    Builds an activity model from active and inactive feature vectors. These feature vectors are expected
+    to be non-correlated.
+
+    :param fn_actives_json: JSON with the active fragments; for each molecules there is a list of its fragments.
+    :param fn_inactives_json: JSON with the inactive fragments; for each molecules there is a list of its fragments.
+    :param features: Dictionary with (fragment; feature vector pairs)
+    :param cnt_bins: Number of bins to be used for binning
+    :return: JSON file with the model
+    """
     logging.info("Building model...")
     feature_matrix = np.array(features["features_vectors"]).transpose()
 
     #Normalize
     mins = np.nanmin(feature_matrix, axis=0)
     maxs = np.nanmax(feature_matrix, axis=0)
-
-    # orig_names = []
-    # orig_mins = []
-    # orig_maxs = []
-    # for row in csv.reader(open("d:/projects/MolecularFragmentsSeparation/normalized.features1.csv", "r")):
-    #     if not row: continue
-    #     if row[0] == "Name":
-    #         orig_names = row[1:]
-    #     elif row[0] == "mins":
-    #         orig_mins = [common.to_float(x) for x in row[1:]]
-    #     elif row[0] == "maxs":
-    #         orig_maxs = [common.to_float(x) for x in row[1:]]
-    #
-    # mins = []
-    # maxs = []
-    # for ix in range(len(orig_names)):
-    #     if orig_names[ix] in features["features_names"]:
-    #         mins.append(orig_mins[ix])
-    #         maxs.append(orig_maxs[ix])
-    # mins = np.array(mins)
-    # maxs = np.array(maxs)
 
     feature_matrix = (feature_matrix - mins) / (maxs-mins)
 
@@ -89,15 +86,6 @@ def build_model(fn_actives_json, fn_inactives_json, features, cnt_bins=100):
                         processed_fragments.append(fragment)
                         features_vector = feature_matrix[features["fragments_names"].index(fragment)].tolist()
                         train_features[activity[ix]].append(features_vector)
-
-
-    # for ix in range(len(features["fragments_names"])):
-    #     frag_name = features["fragments_names"][ix]
-    #     features_vector = feature_matrix[ix].tolist()
-    #     if "a" in features["affiliations"][frag_name]:
-    #         train_features["actives"].append(features_vector)
-    #     if "i" in features["affiliations"][frag_name]:
-    #         train_features["inactives"].append(features_vector)
 
     #Obtain histograms (cnt_bins) for every feature in actives and inactives
     histograms = {"actives": [], "inactives": []}
