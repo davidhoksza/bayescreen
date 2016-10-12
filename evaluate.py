@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Computes performance of a simulated virtual screening campaign where actives and inactives
+are known in advance.
+
+The performance characteristics are:
+    AUC - Arean Under the ROC (Receiver Operating Characteristics) Curve
+    EFn - Enrichment factor computed on top n% of the database
+"""
 
 import common
 import argparse
@@ -16,6 +24,14 @@ EF_FRACTIONS = [0.005, 0.01, 0.02, 0.05]
 
 
 def evaluate_pair(fn_actives, fn_inactives):
+    """
+    For a pair of files with actives and inactives scores computes
+    AUC (area under the ROC curve) and EF (enrichment factor).
+    :param fn_actives: Name of the file with the active molecules scores.
+    :param fn_inactives: Name of the file with the inactive molecules scores.
+    :return: A dictionary with "auc" and "ef" keys. "auc" contains a single value, "ef" contains
+    a list of EFs corresponding to EF_FRACTIONS fractions.
+    """
     ranking = []
     iteration = [{"fn": fn_actives, "activity": 1}, {"fn": fn_inactives, "activity": 0}]
     for it in iteration:
@@ -33,11 +49,19 @@ def evaluate_pair(fn_actives, fn_inactives):
 
 
 def evaluate_directory(dir):
+    """
+    Evaluates multiple simulated screens. The file with actives score is expected to have "actives.out" suffix
+     while the file with inactives scores is expected to have "inactives.out" suffix. The prefix needs to be
+     identical for results from one campaign (e.g., CDK2_actives.out and CDK2_inactives.out)
+
+    :param dir: Directory to be recursively searched for the actives and inactives scoring files.
+    :return:
+    """
     agg_results = {}
-    for fn_actives in common.find_files_recursively(dir, "*_actives.out"):
+    for fn_actives in common.find_files_recursively(dir, "*actives.out"):
         fn_inactives = fn_actives.replace("actives", "inactives")
         performance = evaluate_pair(fn_actives, fn_inactives)
-        print("AUC: {}\n{}".format(fn_actives.replace("_actives", ""), performance["auc"]))
+        print("AUC: {}\n{}".format(fn_actives.replace("actives", ""), performance["auc"]))
         for i in range(len(EF_FRACTIONS)):
             print("EF{}: {}".format(EF_FRACTIONS[i], performance["ef"][i]))
 
@@ -63,6 +87,12 @@ def evaluate_directory(dir):
 
 
 def evaluate_logsdirectory(dir):
+    """
+    The purpose of this function is to merge results of different parameter settings of Bayescreen. It is used
+     solely for the purpose of results publication.
+    :param dir: Directory to be scanned recursively for logs files  (files ending with .log suffix)
+    :return:
+    """
     results = []
     results_names = []
     results_file_names = []
