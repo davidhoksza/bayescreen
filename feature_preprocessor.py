@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Processing fragments' features files in the CSV format. Each line
-consists of a fragment SMILES and a list of features. The header lists
-features names.
+Processing fragments' features CSV files. The CSV files are in the format
+ returned by biochem-tools developed by Petr Skoda. Each line consists of a fragment SMILES
+and a list of features. The header lists features names.
 """
 
 import csv
@@ -19,6 +19,14 @@ __license__ = 'X11'
 # import matplotlib.pyplot as plt
 
 def clusters_to_join(clusters, corr_matrix, corr_threshold):
+    """
+    Finds a pairs of clusters where every pair of compounds is correlated.
+
+    :param clusters: List of existing clusters.
+    :param corr_matrix: Correlation matrix storing correlation information for every pair of molecules.
+    :param corr_threshold: The minimum correlation value for a pair of molecules to be considered correlated.
+    :return: Pair (list) of correlated clusters or [-1,-1]
+    """
     for i in range(len(clusters)):
         for j in range(i+1, len(clusters)):
             correlated = True
@@ -34,6 +42,22 @@ def clusters_to_join(clusters, corr_matrix, corr_threshold):
 
 
 def process(fn_csv_actives, fn_csv_inactives, log_file_name, corr_threshold):
+    """
+    The function takes input CSV files with fragments and their corresponding feature values, joins them
+     into single list and:
+
+    1. Removes features which are constant
+    2. Imputes missing values by medians of the values for each feature.
+    3. Computes correlation matrix for every pair of features
+    4. Identifies clusters of correlated features.
+    5. For each cluster, randomlly picks one feature to keep.
+
+    :param fn_csv_actives: CSV file with fragments from active molecules and corresponding features.
+    :param fn_csv_inactives: CSV file with fragments from inactive molecules and corresponding features.
+    :param log_file_name: Log file name where to store information about correlation clusters.
+    :param corr_threshold: The minimum correlation value for a pair of molecules to be considered correlated.
+    :return: Dictionary with the remaining, preprocessed, features.
+    """
     logging.info("Preprocessing descriptors (imputation, correlated descriptors removal)...")
     features = []
     feature_names = []

@@ -71,5 +71,10 @@ The output includes the following information:
 * General model information (list features, used fragment types, feature generator)
 * Importance of feature values in decreasing order. If the `-f` option is turned on, all the values are present, otherwise only the top 50 are listed.
 
+### Contributing
+
+We welcome any bug reports, enhancement requests, and other contributions. To submit a bug report or enhancement request, please use the GitHub issues tracker or 
+contact directly David Hoksza.
+
 
 
