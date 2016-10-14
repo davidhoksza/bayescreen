@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Analyzes Bayes activity model.
-
+Script doing the actual virtual screening of a library of compounds over a previously built Bayesian model.
 """
 
 import argparse
@@ -21,6 +20,17 @@ __license__ = 'X11'
 
 
 def score_feature_vector(feature_vector, probs, cnt_bins):
+    """
+    For a feature vector, computes its log transformed likelihood ratio with respect to the model.
+    That is, every feature value in the feature vector is evaluated and log of the likelihood ratio is added
+    to the total score.
+
+    :param feature_vector: Vector of feature values (each value is expected to be already scaled to the [0;1] interval)
+    :param probs: Model storing the probabilities of individual feature values of being related to activity.
+    :param cnt_bins: Number of bins to be used in the binning (the model has probabilities for bins,
+    not individual values).
+    :return:  Log of likelihood ratio of the input feature vector.
+    """
     ix = 0
     score = 0
     for feature_value in feature_vector:
@@ -34,6 +44,14 @@ def score_feature_vector(feature_vector, probs, cnt_bins):
 
 
 def screen(fn_ds_json, model, fragments_features):
+    """
+    Screening of fragments against the model.
+
+    :param fn_ds_json: List of molecules to screen and their respective features (as returned by of biochem-tools)
+    :param model: Model storing the probabilities of individual feature values of being related to activity
+    :param fragments_features: Dictionary with information about fragments and corresponding feature vectors
+    :return: List dictionaries of molecules and scores ({"molecule", "score"})
+    """
     with common.open_file(fn_ds_json) as f:
         mols = json.load(f)
         for mol in mols:
@@ -54,6 +72,14 @@ def screen(fn_ds_json, model, fragments_features):
 
 
 def get_normalized_features(fn_ds_csv, model):
+    """
+    When fragments are extracted from the screening library and feature vectors are computed, they need to be
+    normalized in the same way the model was normalized. That happens in this function.
+
+    :param fn_ds_csv: CSV file with fragments from active molecules and corresponding features.
+    :param model: The Bayes model including normalization information.
+    :return: Dictionary with keys corresponding to fragments and values to normalized feature vectors.
+    """
     feature_names = model["features_names"]
     ixs_uncorr_features = []
     features = []
@@ -107,6 +133,18 @@ def get_normalized_features(fn_ds_csv, model):
 
 
 def main():
+    """
+    The function implements the following steps:
+        1. Reading in the model
+        2. Extracting fragments for every input molecule (biochem-tools) and storing them in a json file.
+        3. Generating features for the extracted fragments (biochem-tools) and storing them in a csv file.
+        4. Normalizing the features.
+        5. Screening.
+        6. Outputing ranked library together with the scores.
+        7. Optionally deleting the intermediate files, i.e. the fragments (json) and their features (csv)
+
+    :return:
+    """
     common.init_logging()
 
     with common.open_file(args.model) as f:
