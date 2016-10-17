@@ -35,7 +35,7 @@ python build_model.py -a testing/a_train.sdf -i testing/i_train.sdf -m testing/m
 
 The `model.bm` is a [JSON](https://en.wikipedia.org/wiki/JSON) file which stores the probabilities used to build the Naive Bayes classifier, imputation and normalization values for every feature and other informations about the model such as which feature generator was used (RDKit or PaDEL) or binning information.
 
-If the fragments and corresponding features are needed, remove the `c` (`--clean`) option.
+If the fragments and corresponding features are needed, remove the `-c` (`--clean`) option.
 
 ### Screening
 
