@@ -102,11 +102,16 @@ def analyze_models(dir):
         else:
             features_factors[val["cnt"]].append(val)
 
+    compressed = ""
     for key in sorted(features_factors, reverse=True):
         print(key)
         for val in sorted(features_factors[key], key=lambda x: x["ratio"], reverse=True):
             print("{}({};{}): {}".format(val["name"], val["interval"][0], val["interval"][1], val["ratio"]/val["cnt"]))
+            compressed = "{}, {}-{} ({} - {:.2f})".format(compressed, val["name"], round(val["interval"][1] - val["interval"][0],1), key, val["ratio"]/val["cnt"])
         print("")
+
+    print("Compressed:")
+    print(compressed.strip(", "))
 
 
 if __name__ == '__main__':
