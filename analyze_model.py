@@ -17,6 +17,7 @@ __author__ = "David Hoksza"
 __email__ = "david.hoksza@mff.cuni.cz"
 __license__ = 'X11'
 
+
 def multipage(filename, figs=None, dpi=200):
     pp = PdfPages(filename)
     if figs is None:
@@ -24,6 +25,7 @@ def multipage(filename, figs=None, dpi=200):
     for fig in figs:
         fig.savefig(pp, format='pdf')
     pp.close()
+
 
 def analyze(model):
     print("==== General information ====")
@@ -40,14 +42,6 @@ def analyze(model):
         for ix_bin in range(cnt_bins):
             probability_ratios[fn].append(probs["feature_value_in_actives"][ix_fn][ix_bin] /
                                           probs["feature_value_in_inactives"][ix_fn][ix_bin])
-
-    print("\n==== Relative features importance aggregated over all values of given feature ====")
-    sum_ratios = {}
-    for fn in probability_ratios:
-        sum_ratios[fn] = np.sum(probability_ratios[fn])
-    s = np.sum(sum_ratios.values())
-    for fn, sr in sorted(sum_ratios.items(), key=lambda x: x[1], reverse=True):
-        print("{}:{} ({})".format(fn, s, sr/s))
 
     mins = model["normalization"]["mins"]
     maxs = model["normalization"]["maxs"]
@@ -74,6 +68,14 @@ def analyze(model):
         print("{}, {}, {}, {}".format(rec["value"], rec["feature"], rec["bin"], rec["range"]))
         cnt_printed += 1
         if not args.full and cnt_printed > 50: break;
+
+    print("\n==== Relative features importance aggregated over all values of given feature ====")
+    sum_ratios = {}
+    for fn in probability_ratios:
+        sum_ratios[fn] = np.sum(probability_ratios[fn])
+    s = np.sum(sum_ratios.values())
+    for fn, sr in sorted(sum_ratios.items(), key=lambda x: x[1], reverse=True):
+        print("{}:{} ({})".format(fn, s, sr / s))
 
 
 def main():
