@@ -13,6 +13,7 @@ import common
 import argparse
 import numpy as np
 import os
+import sys
 from rdkit.ML.Scoring import Scoring
 
 
@@ -58,7 +59,7 @@ def evaluate_directory(dir):
     :return:
     """
     agg_results = {}
-    for fn_actives in common.find_files_recursively(dir, "*actives.out"):
+    for fn_actives in common.find_files_recursively(dir, "*_actives.out"):
         fn_inactives = fn_actives.replace("actives", "inactives")
         performance = evaluate_pair(fn_actives, fn_inactives)
         print("AUC: {}\n{}".format(fn_actives.replace("actives", ""), performance["auc"]))
@@ -159,6 +160,11 @@ if __name__ == '__main__':
                         help="Index of the target name in the directory path")
     parser.add_argument("--group-index", default="-4", type=int,
                         help="Index of the group name in the directory path")
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
     args = parser.parse_args()
 
     main()
