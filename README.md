@@ -24,7 +24,11 @@ Bayescreen consists of three utilities:
 * Screen a compound library against a model
 * Analyze a model
 
-To carry out the screening, one needs a set of known active and inactive molecules and a set of molecules (either in SDF or SMILES format) to screen. The following commands show an example usage of Bayescreen to screen the [CDK2](https://en.wikipedia.org/wiki/Cyclin-dependent_kinase_2) enzyme. The dataset is part of the collections from the [lbvs-environment](https://github.com/skodapetr/lbvs-environment) project, but for convenience the data of the CDK2 dataset are distribued together with Bayescreen (available in the test directory). 
+To carry out the screening, one needs a set of known active and inactive molecules and a set of molecules (either in SDF or SMILES format) to screen. The following commands show an example usage of Bayescreen to screen the [CDK2](https://en.wikipedia.org/wiki/Cyclin-dependent_kinase_2) enzyme. The dataset is part of the collections from the [lbvs-environment](https://github.com/skodapetr/lbvs-environment) project, but for convenience the data of the CDK2 dataset are distribued together with Bayescreen. An archive with the SDF files with the molecules are available in the test directory. To unzip them, run:
+
+```
+ tar xzvf test/cdk.tar.gz -C test
+ ```
 
 ### Model construction
 To build a model based on known actives stored in `test/a_train.sdf` and inactives stored in `test/i_train.sdf` using RDKit for generating fragment features and store it in `model.bm` run:
