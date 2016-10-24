@@ -82,7 +82,7 @@ def fragments_extraction(ds_file_names, fragment_types):
             fn_json.append(fn[:-4] + ".frags.json")
         else:
             fn_json.append(fn + ".json")
-        # biochem_tools.extract_fragments([fn], file_type, fn_json[-1], extraction_options)
+        biochem_tools.extract_fragments([fn], file_type, fn_json[-1], extraction_options)
 
     return fn_json
 
@@ -91,10 +91,10 @@ def descriptors_extraction(json_file_names, descriptors_generator, padel_path):
     fn_csv = []
     for fn in json_file_names:
         fn_csv.append(fn[:-5] + ".csv")
-        # if descriptors_generator == "rdkit":
-        #     biochem_tools.rdkit_compute_descriptors(fn, fn_csv[-1], True)
-        # elif descriptors_generator == "padel":
-        #     biochem_tools.padel_compute_descriptors(fn, fn_csv[-1], True, padel_path)
+        if descriptors_generator == "rdkit":
+            biochem_tools.rdkit_compute_descriptors(fn, fn_csv[-1], True)
+        elif descriptors_generator == "padel":
+            biochem_tools.padel_compute_descriptors(fn, fn_csv[-1], True, padel_path)
 
     return fn_csv
 

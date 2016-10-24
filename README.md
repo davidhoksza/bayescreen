@@ -31,10 +31,10 @@ To carry out the screening, one needs a set of known active and inactive molecul
  ```
 
 ### Model construction
-To build a model based on known actives stored in `test/a_train.sdf` and inactives stored in `test/i_train.sdf` using RDKit for generating fragment features and store it in `model.bm` run:
+To build a model based on known actives stored in `test/a_cdk_train.sdf` and inactives stored in `test/i_cdk_train.sdf` using RDKit for generating fragment features and store it in `model.bm` run:
 
 ```
-python build_model.py -a testing/a_train.sdf -i testing/i_train.sdf -m testing/model.bm -c
+python build_model.py -a test/a_cdk_train.sdf -i test/i_cdk_train.sdf -m test/model.bm -c
 ```
 
 The `model.bm` is a [JSON](https://en.wikipedia.org/wiki/JSON) file which stores the probabilities used to build the Naive Bayes classifier, imputation and normalization values for every feature and other informations about the model such as which feature generator was used (RDKit or PaDEL) or binning information.
@@ -50,8 +50,8 @@ In order to also evaluate the perfromance of Bayescreen we use the split to acti
 To screen the compounds run:
 
 ```
-python screen.py -m testing/model.bm -d testing/a_test.sdf -o testing/a_test.out
-python screen.py -m testing/model.bm -d testing/i_test.sdf -o testing/i_test.out
+python screen.py -m test/model.bm -d test/a_cdk_test.sdf -o test/a_test.out
+python screen.py -m test/model.bm -d test/i_cdk_test.sdf -o test/i_test.out
 ```
 
 The `x_test.out` contains the screening library sorted by decreasing probability of those molecules being active (average probability ratios of their fragments feature vectors).
@@ -59,7 +59,7 @@ The `x_test.out` contains the screening library sorted by decreasing probability
 To evaluate the performance, we provide a utility which utilizes RDKit to obtain the area under the ROC curve (AUC) and enrichment factor (EF). To get the performance, run:
 
 ```
-python eval.py -a testing/a_test.out -i testing/i_test.out
+python eval.py -a test/a_test.out -i test/i_test.out
 ```
 
 ### Model analysis
