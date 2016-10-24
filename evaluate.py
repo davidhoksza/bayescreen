@@ -14,6 +14,7 @@ import argparse
 import numpy as np
 import os
 import sys
+import re
 from rdkit.ML.Scoring import Scoring
 
 
@@ -97,37 +98,44 @@ def evaluate_logsdirectory(dir):
     results = []
     results_names = []
     results_file_names = []
-    for log in common.find_files_recursively(dir, "*.log"):
+    for log in sorted(common.find_files_recursively(dir, "*.log"), key = lambda e: e.replace(".log", "").replace("1-", "x-")):
         with common.open_file(log) as f:
             results_file_names.append(os.path.basename(log).replace(".log", ""))
             inside = False
-            results.append([])
+            results.append({})
+            results_type = ""
             for line in f:
-                if line.startswith("8"): inside = True
-                if inside:
+                if re.match("^(AUC|EF0.[0-9]*)$", line.strip(), re.I):
+                # if line.strip().upper() in ("AUC", "EF0.005", "EF0.01", "EF0.02", "EF0.05"):
+                    results_type = line.strip().upper()
+                    results[-1][results_type] = []
+                    continue
+                if results_type != "":
                     s_line = line.split(",")
-                    results[-1].append(common.to_float(s_line[2]))
-                    if len(results_file_names) == 1:
+                    results[-1][results_type].append(common.to_float(s_line[2]))
+                    if len(results_file_names) == 1 and len(results[-1]) == 1:
                         results_names.append(s_line[0:2])
 
-    l = len(results[0])
+    l = len(results[0]["AUC"])
     equal_length = True
     for res in results:
-        if len(res) != l:
+        if len(res["AUC"]) != l:
             equal_length = False
             break
     if not equal_length:
-        print ("The result sets differ in size (number of targets")
+        print("The result sets differ in size (number of targets")
         for i in range(len(results_file_names)):
             print("{}: {}".format(results_file_names[i], len(results[i])))
         exit()
 
-    print(",," + ",".join(results_file_names))
-    for i in range(len(results_names)):
-        values = ""
-        for res in results:
-            values += "{},".format(res[i])
-        print("{},{},{}".format(results_names[i][0], results_names[i][1], values.strip(",")))
+    for results_type in sorted(results[0]):
+        print(results_type)
+        print(",," + ",".join(results_file_names))
+        for i in range(len(results_names)):
+            values = ""
+            for res in results:
+                values += "{},".format(res[results_type][i])
+            print("{},{},{}".format(results_names[i][0], results_names[i][1], values.strip(",")))
 
 
 def main():
