@@ -1,5 +1,5 @@
 # Bayescreen
-Easy-to-use command line virtual screening tool utilitizing machine learning to build activity-based model given a set of input compounds.
+Easy-to-use command line virtual screening tool utilizing machine learning to build activity-based model given a set of input compounds.
 The model is built over feaures of molecular fragments features and uses Naive Bayes classifier coupled with likelihood ratio scoring to prioritize the compound library to be screened.
 
 ## Installation
