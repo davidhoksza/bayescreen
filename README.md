@@ -67,13 +67,13 @@ python eval.py -a test/a_test.out -i test/i_test.out
 To analyze the model run:
 
 ```
-python analyze.py -m model.bm -f
+python analyze_model.py -m test/model.bm -f
 ```
 
 The output includes the following information:
 
 * General model information (list features, used fragment types, feature generator)
-* Importance of feature values in decreasing order. If the `-f` option is turned on, all the values are present, otherwise only the top 50 are listed.
+* Importance of feature values in decreasing order. If the `-f` option is turned on, all the values are shown, otherwise only the top 50 are listed.
 
 ### Contributing
 
