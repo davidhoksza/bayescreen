@@ -30,9 +30,15 @@ def read_sdf(f):
 
 
 def main():
+    # The group file contains definition of activity for the test set.
+    with common.open_file(args.group) as fg:
+        group_data = json.load(fg)
+        group_actives = set([item["name"] for item in group_data["data"]["ligands"]])
+        group_inactives = set([item["name"] for item in group_data["data"]["decoys"]])
+        
     with common.open_file(args.input) as f:
         split_data = json.load(f)
-        [fn_inactives, fn_actives] = split_data["files"]
+        [fn_inactives, fn_actives] = split_data["data"]["files"]
 
         with common.open_file(args.dir + "/" + fn_actives + ".sdf") as fa:
             molecules = read_sdf(fa)
@@ -47,9 +53,8 @@ def main():
                     fta.write(molecules[molecule["name"]])
             with common.open_file(fns[1], "w") as fta:
                 for molecule in split_data["data"]["test"]:
-                    if molecule["activity"] == 1:
+                    if molecule["name"] in group_actives:
                         fta.write(molecules[molecule["name"]])
-
         with common.open_file(args.dir + "/" + fn_inactives + ".sdf") as fi:
             molecules = read_sdf(fi)
 
@@ -63,7 +68,7 @@ def main():
                     fta.write(molecules[molecule["name"]])
             with common.open_file(fns[1], "w") as fta:
                 for molecule in split_data["data"]["test"]:
-                    if molecule["activity"] == 0:
+                    if molecule["name"] in group_inactives:
                         fta.write(molecules[molecule["name"]])
 
 
@@ -72,6 +77,9 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--input",
                         required=True,
                         help="JSON input file")
+    parser.add_argument("-g", "--group",
+                        required=True,
+                        help="Group file for the input")
     parser.add_argument("-d", "--dir",
                         required=True,
                         help="Directory with sdf files (if different from current dir)",
