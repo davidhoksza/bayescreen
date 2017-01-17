@@ -59,7 +59,7 @@ The `x_test.out` contains the screening library sorted by decreasing probability
 To evaluate the performance, we provide a utility which utilizes RDKit to obtain the area under the ROC curve (AUC) and enrichment factor (EF). To get the performance, run:
 
 ```
-python eval.py -a test/a_test.out -i test/i_test.out
+python evaluate.py -a test/a_test.out -i test/i_test.out
 ```
 
 ### Model analysis
