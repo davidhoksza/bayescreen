@@ -45,7 +45,7 @@ If the fragments and corresponding features are needed, remove the `-c` (`--clea
 
 Screening of the compounds ranks the compounds based on their probability of being active against the same target as the `a_train.sdf` molecules, i.e. the molecules on which the model was built. 
 
-In order to also evaluate the perfromance of Bayescreen we use the split to actives and inactives provided by the XXX. Thus we separately screen the `a_test.sdf` molecules and `i_test.sdf` corresponding to the active and inactive molecules, respectively (obviously, this division will not be known in real VS campaign). both of the
+In order to also evaluate the perfromance of Bayescreen we use the splits provided by the [lbvs-environment](https://github.com/skodapetr/lbvs-environment). Thus we separately screen the `a_test.sdf` molecules and `i_test.sdf` corresponding to the active and inactive molecules, respectively (obviously, this division will not be known in real VS campaign). both of the
 
 To screen the compounds run:
 
@@ -56,7 +56,7 @@ python screen.py -m test/model.bm -d test/i_cdk_test.sdf -o test/i_test.out
 
 The `x_test.out` contains the screening library sorted by decreasing probability of those molecules being active (average probability ratios of their fragments feature vectors).
 
-To evaluate the performance, we provide a utility which utilizes RDKit to obtain the area under the ROC curve (AUC) and enrichment factor (EF). To get the performance, run:
+To evaluate the performance, we provide a utility which utilizes RDKit to obtain the area under the ROC curve (AUC) and enrichment factors (EF) on 0.5%, 1%, 2% and 5% of the database. To get the performance, run:
 
 ```
 python evaluate.py -a test/a_test.out -i test/i_test.out
