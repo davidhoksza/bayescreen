@@ -19,7 +19,7 @@ __email__ = "david.hoksza@mff.cuni.cz"
 __license__ = 'X11'
 
 
-def score_feature_vector(feature_vector, probs, cnt_bins):
+def score_feature_vector(feature_vector, probs, cnt_bins, restrict_features):
     """
     For a feature vector, computes its log transformed likelihood ratio with respect to the model.
     That is, every feature value in the feature vector is evaluated and log of the likelihood ratio is added
@@ -29,11 +29,14 @@ def score_feature_vector(feature_vector, probs, cnt_bins):
     :param probs: Model storing the probabilities of individual feature values of being related to activity.
     :param cnt_bins: Number of bins to be used in the binning (the model has probabilities for bins,
     not individual values).
+    :param restrict_features: List of features to be considered when evaluating the vector. If the list is empty,
+    all features will be evaluated
     :return:  Log of likelihood ratio of the input feature vector.
     """
     ix = 0
     score = 0
-    for feature_value in feature_vector:
+    for ix_feature in restrict_features:
+        feature_value = feature_vector[ix_feature]
         fv = int(math.floor(feature_value * cnt_bins))  # feature values are scaled to [0,1]
         if fv == cnt_bins: fv -= 1  # feature_value 1 will map to the last bin
         score += math.log(
@@ -43,7 +46,7 @@ def score_feature_vector(feature_vector, probs, cnt_bins):
     return score
 
 
-def screen(fn_ds_json, model, fragments_features):
+def screen(fn_ds_json, model, fragments_features, restrict_features):
     """
     Screening of fragments against the model.
 
@@ -60,7 +63,7 @@ def screen(fn_ds_json, model, fragments_features):
             for frag in mol["fragments"]:
                 if frag["smiles"] not in processed_frags:
                     processed_frags.append(frag["smiles"])
-                    fragments_scores.append(score_feature_vector(fragments_features[frag["smiles"]], model["probabilities"], model["cnt_bins"]))
+                    fragments_scores.append(score_feature_vector(fragments_features[frag["smiles"]], model["probabilities"], model["cnt_bins"], restrict_features))
 
             if len(fragments_scores) > 0:
                 # mol["score"] = np.nanmean(fragments_scores) #not available for np < 1.7
@@ -154,7 +157,17 @@ def main():
         [fn_ds_csv] = common.descriptors_extraction([fn_ds_json], model["features_generator"], model["path_to_padel"])
         fragments_features = get_normalized_features(fn_ds_csv, model)
 
-        results = screen(fn_ds_json, model, fragments_features)
+        # Convert list of features to restrict the model into a lit
+        restrict_features = list(range(0, len(model['features_names'])))
+        if args.features:
+            restrict_features = []
+            aux_features = [aux_feature.lower() for aux_feature in model['features_names']]
+            for aux_feature in args.features.split(","):
+                aux_feature = aux_feature.strip().lower()
+                if aux_feature in aux_features:
+                    restrict_features.append(aux_features.index(aux_feature))
+
+        results = screen(fn_ds_json, model, fragments_features, restrict_features)
         with common.open_file(args.output, "w") as f:
             for r in results:
                 f.write("{}: {}\n".format(r["molecule"], r["score"]))
@@ -174,6 +187,11 @@ if __name__ == '__main__':
     parser.add_argument("-o", "--output",
                         required=True,
                         help="Output file for resulting ranking.")
+    parser.add_argument("-f", "--features",
+                        required=False,
+                        help="Comma separated list of features which will be considered when evaluating model. "
+                             "Using this features, one can limit the set of features to be used to assess activity, "
+                             "i.e. one can use only the most relevant features.")
     parser.add_argument("-c", "--clean",
                         action='store_true',
                         help="Delete the fragment and features files.")
