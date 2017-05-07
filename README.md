@@ -75,6 +75,14 @@ The output includes the following information:
 * General model information (list features, used fragment types, feature generator)
 * Importance of feature values in decreasing order. If the `-f` option is turned on, all the values are shown, otherwise only the top 50 are listed.
 
+### Citation
+
+If you use Bayescreen, please cite it using the following citation (journal version is in process):
+
+```
+Hoksza, D., & Škoda, P. (2016, October). Using Bayesian modeling on molecular fragments features for virtual screening. In Computational Intelligence in Bioinformatics and Computational Biology (CIBCB), 2016 IEEE Conference on (pp. 1-6). IEEE.
+```
+
 ### Contributing
 
 We welcome any bug reports, enhancement requests, and other contributions. To submit a bug report or enhancement request, please use the GitHub issues tracker or 
